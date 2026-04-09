@@ -37,6 +37,12 @@ def run(target_word: str) -> None:  # noqa: ARG001 – target_word unused but ke
         check=True,
     )
 
+    # piper-sample-generator is now a pip package (no git clone required)
+    subprocess.run(
+        [sys.executable, "-m", "pip", "install", "piper-sample-generator"],
+        check=True,
+    )
+
     subprocess.run(["git", "clone", "https://github.com/kahrendt/microWakeWord"], check=True)
 
     subprocess.run(
