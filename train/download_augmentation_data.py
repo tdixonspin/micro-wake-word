@@ -51,7 +51,7 @@ def run(target_word: str) -> None:  # noqa: ARG001
         os.mkdir(output_dir)
         audioset_dataset = datasets.load_dataset(
             "agkphysics/AudioSet",
-            "balanced-train",
+            "balanced",
             split="train",
             streaming=True,
             trust_remote_code=True,
