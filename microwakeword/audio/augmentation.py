@@ -18,6 +18,7 @@ import warnings
 
 import numpy as np
 
+from pathlib import Path
 from typing import List
 
 
@@ -99,18 +100,28 @@ class Augmentation:
         reverb_augment = audiomentations.Lambda(transform=identity_transform, p=0.0)
 
         if len(background_paths):
-            background_noise_augment = audiomentations.AddBackgroundNoise(
-                p=augmentation_probabilities.get("AddBackgroundNoise", 0.0),
-                sounds_path=background_paths,
-                min_snr_db=background_min_snr_db,
-                max_snr_db=background_max_snr_db,
-            )
+            valid_background_paths = [
+                p for p in background_paths
+                if any(Path(p).glob("**/*.wav"))
+            ]
+            if valid_background_paths:
+                background_noise_augment = audiomentations.AddBackgroundNoise(
+                    p=augmentation_probabilities.get("AddBackgroundNoise", 0.0),
+                    sounds_path=valid_background_paths,
+                    min_snr_db=background_min_snr_db,
+                    max_snr_db=background_max_snr_db,
+                )
 
         if len(impulse_paths) > 0:
-            reverb_augment = audiomentations.ApplyImpulseResponse(
-                p=augmentation_probabilities.get("RIR", 0.0),
-                ir_path=impulse_paths,
-            )
+            valid_impulse_paths = [
+                p for p in impulse_paths
+                if any(Path(p).glob("**/*.wav"))
+            ]
+            if valid_impulse_paths:
+                reverb_augment = audiomentations.ApplyImpulseResponse(
+                    p=augmentation_probabilities.get("RIR", 0.0),
+                    ir_path=valid_impulse_paths,
+                )
 
         # Based on openWakeWord's augmentations, accessed on February 23, 2024.
         self.augment = audiomentations.Compose(
