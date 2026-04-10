@@ -46,32 +46,19 @@ def run(target_word: str) -> None:  # noqa: ARG001
     # ------------------------------------------------------------------ #
     # AudioSet balanced-train subset
     # ------------------------------------------------------------------ #
-    if not os.path.exists("audioset"):
-        os.mkdir("audioset")
-
-        fname = "bal_train09.tar"
-        out_path = f"audioset/{fname}"
-        link = "https://huggingface.co/datasets/agkphysics/AudioSet/resolve/main/data/" + fname
-        subprocess.run(["wget", "-O", out_path, link], check=True)
-        subprocess.run(["tar", "-xf", fname], cwd="audioset", check=True)
-
-        output_dir = "./audioset_16k"
-        if not os.path.exists(output_dir):
-            os.mkdir(output_dir)
-
-        audioset_files = sorted(Path("audioset/audio").glob("**/*.flac"))
-        audioset_dataset = datasets.Dataset.from_dict(
-            {"audio": [str(f) for f in audioset_files]}
-        )
-        audioset_dataset = audioset_dataset.cast_column(
-            "audio", datasets.Audio(sampling_rate=16000)
-        )
-        for file_path, row in tqdm(
-            zip(audioset_files, audioset_dataset), desc="AudioSet", total=len(audioset_files)
-        ):
-            name = file_path.name.replace(".flac", ".wav")
+    output_dir = "./audioset_16k"
+    if not os.path.exists(output_dir):
+        os.mkdir(output_dir)
+        audioset_dataset = datasets.load_dataset(
+            "agkphysics/AudioSet",
+            "balanced-train",
+            split="train",
+            streaming=True,
+            trust_remote_code=True,
+        ).cast_column("audio", datasets.Audio(sampling_rate=16000))
+        for idx, row in enumerate(tqdm(audioset_dataset, desc="AudioSet")):
             scipy.io.wavfile.write(
-                os.path.join(output_dir, name),
+                os.path.join(output_dir, f"audioset_{idx:05d}.wav"),
                 16000,
                 (row["audio"]["array"] * 32767).astype(np.int16),
             )
