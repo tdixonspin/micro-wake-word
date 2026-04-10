@@ -12,6 +12,8 @@ import os
 import subprocess
 import sys
 
+from train.install import PIPER_SG_DIR
+
 MODEL_DIR = "models"
 MODEL_FILENAME = "en-us-libritts-high.pt"
 MODEL_URL = (
@@ -38,6 +40,12 @@ def run(target_word: str) -> None:
 
     model_path = _ensure_model()
 
+    # piper_train/ lives at the root of the piper-sample-generator clone,
+    # one level above the piper_sample_generator/ package directory.
+    # Set PYTHONPATH so the subprocess can find it.
+    env = os.environ.copy()
+    env["PYTHONPATH"] = PIPER_SG_DIR + os.pathsep + env.get("PYTHONPATH", "")
+
     subprocess.run(
         [
             sys.executable,
@@ -53,6 +61,7 @@ def run(target_word: str) -> None:
             "--output-dir",
             "generated_samples",
         ],
+        env=env,
         check=True,
     )
 

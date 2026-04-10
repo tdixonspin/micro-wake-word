@@ -4,9 +4,12 @@ Cell 1 – Install microWakeWord and its dependencies.
 Be sure to restart the Python session after this step if running interactively.
 """
 
+import os
 import platform
 import subprocess
 import sys
+
+PIPER_SG_DIR = "piper-sample-generator"
 
 
 def run(target_word: str) -> None:  # noqa: ARG001 – target_word unused but kept for uniform signature
@@ -37,9 +40,28 @@ def run(target_word: str) -> None:  # noqa: ARG001 – target_word unused but ke
         check=True,
     )
 
-    # piper-sample-generator is now a pip package (no git clone required)
+    # Clone piper-sample-generator so that piper_train/ (a sibling of
+    # piper_sample_generator/ in the repo) is available at runtime.
+    # The PyPI wheel omits piper_train, so we must use the source tree.
+    if not os.path.exists(PIPER_SG_DIR):
+        if platform.system() == "Darwin":
+            # macOS fork adds MPS (Apple Silicon) support
+            subprocess.run(
+                ["git", "clone", "-b", "mps-support",
+                 "https://github.com/kahrendt/piper-sample-generator", PIPER_SG_DIR],
+                check=True,
+            )
+        else:
+            subprocess.run(
+                ["git", "clone",
+                 "https://github.com/rhasspy/piper-sample-generator", PIPER_SG_DIR],
+                check=True,
+            )
+
+    # Install declared dependencies (torch, torchaudio, piper-tts, etc.) while
+    # leaving the source tree in place so piper_train remains importable.
     subprocess.run(
-        [sys.executable, "-m", "pip", "install", "piper-sample-generator"],
+        [sys.executable, "-m", "pip", "install", PIPER_SG_DIR],
         check=True,
     )
 

@@ -7,16 +7,21 @@ speeds), --slerp-weights (speaker blending), and generating negative samples
 similar to the wake word.
 """
 
+import os
 import subprocess
 import sys
 
 from train.generate_single_sample import MODEL_DIR, MODEL_FILENAME, _ensure_model
+from train.install import PIPER_SG_DIR
 
 
 def run(target_word: str) -> None:
     """Generate 1000 TTS samples of *target_word* into ./generated_samples."""
 
     model_path = _ensure_model()
+
+    env = os.environ.copy()
+    env["PYTHONPATH"] = PIPER_SG_DIR + os.pathsep + env.get("PYTHONPATH", "")
 
     subprocess.run(
         [
@@ -33,5 +38,6 @@ def run(target_word: str) -> None:
             "--output-dir",
             "generated_samples",
         ],
+        env=env,
         check=True,
     )
