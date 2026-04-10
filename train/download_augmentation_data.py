@@ -35,8 +35,8 @@ def run(target_word: str) -> None:  # noqa: ARG001
             split="train",
             streaming=True,
         )
-        for row in tqdm(rir_dataset, desc="MIT RIRs"):
-            name = row["audio"]["path"].split("/")[-1]
+        for idx, row in enumerate(tqdm(rir_dataset, desc="MIT RIRs")):
+            name = f"rir_{idx:04d}.wav"
             scipy.io.wavfile.write(
                 os.path.join(output_dir, name),
                 16000,
@@ -59,14 +59,17 @@ def run(target_word: str) -> None:  # noqa: ARG001
         if not os.path.exists(output_dir):
             os.mkdir(output_dir)
 
+        audioset_files = sorted(Path("audioset/audio").glob("**/*.flac"))
         audioset_dataset = datasets.Dataset.from_dict(
-            {"audio": [str(i) for i in Path("audioset/audio").glob("**/*.flac")]}
+            {"audio": [str(f) for f in audioset_files]}
         )
         audioset_dataset = audioset_dataset.cast_column(
             "audio", datasets.Audio(sampling_rate=16000)
         )
-        for row in tqdm(audioset_dataset, desc="AudioSet"):
-            name = row["audio"]["path"].split("/")[-1].replace(".flac", ".wav")
+        for file_path, row in tqdm(
+            zip(audioset_files, audioset_dataset), desc="AudioSet", total=len(audioset_files)
+        ):
+            name = file_path.name.replace(".flac", ".wav")
             scipy.io.wavfile.write(
                 os.path.join(output_dir, name),
                 16000,
@@ -89,12 +92,15 @@ def run(target_word: str) -> None:  # noqa: ARG001
         if not os.path.exists(fma_16k_dir):
             os.mkdir(fma_16k_dir)
 
+        fma_files = sorted(Path("fma/fma_small").glob("**/*.mp3"))
         fma_dataset = datasets.Dataset.from_dict(
-            {"audio": [str(i) for i in Path("fma/fma_small").glob("**/*.mp3")]}
+            {"audio": [str(f) for f in fma_files]}
         )
         fma_dataset = fma_dataset.cast_column("audio", datasets.Audio(sampling_rate=16000))
-        for row in tqdm(fma_dataset, desc="FMA"):
-            name = row["audio"]["path"].split("/")[-1].replace(".mp3", ".wav")
+        for file_path, row in tqdm(
+            zip(fma_files, fma_dataset), desc="FMA", total=len(fma_files)
+        ):
+            name = file_path.name.replace(".mp3", ".wav")
             scipy.io.wavfile.write(
                 os.path.join(fma_16k_dir, name),
                 16000,
