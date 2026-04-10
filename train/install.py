@@ -4,6 +4,7 @@ Cell 1 – Install microWakeWord and its dependencies.
 Be sure to restart the Python session after this step if running interactively.
 """
 
+import os
 import platform
 import subprocess
 import sys
@@ -43,7 +44,8 @@ def run(target_word: str) -> None:  # noqa: ARG001 – target_word unused but ke
         check=True,
     )
 
-    subprocess.run(["git", "clone", "https://github.com/kahrendt/microWakeWord"], check=True)
+    if not os.path.exists("microWakeWord"):
+        subprocess.run(["git", "clone", "https://github.com/kahrendt/microWakeWord"], check=True)
 
     subprocess.run(
         [sys.executable, "-m", "pip", "install", "-e", "./microWakeWord"],
