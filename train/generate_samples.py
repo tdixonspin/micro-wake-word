@@ -30,7 +30,7 @@ def run(target_word: str) -> None:
             "piper_sample_generator",
             target_word,
             "--model",
-            model_path,
+            os.path.abspath(model_path),
             "--max-samples",
             "1000",
             "--batch-size",

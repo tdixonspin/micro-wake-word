@@ -5,7 +5,7 @@ Installs piper-sample-generator (if needed), downloads the LibriTTS-R generator
 model, and produces one wav file so you can confirm the phonetic spelling sounds
 correct before generating thousands of samples.
 
-The generator model is downloaded to ./models/en-us-libritts-high.pt on first run.
+The generator model is downloaded to ./piper-sample-generator/models/en-us-libritts-high.pt on first run.
 """
 
 import os
@@ -14,7 +14,10 @@ import sys
 
 from train.install import PIPER_SG_DIR
 
-MODEL_DIR = "models"
+# Store the model inside the cloned repo's models/ directory so that the
+# matching en-us-libritts-high.pt.json config (committed in that repo) is
+# automatically present alongside it.
+MODEL_DIR = os.path.join(PIPER_SG_DIR, "models")
 MODEL_FILENAME = "en-us-libritts-high.pt"
 MODEL_URL = (
     "https://github.com/rhasspy/piper-sample-generator/releases/download/v2.0.0"
@@ -53,7 +56,7 @@ def run(target_word: str) -> None:
             "piper_sample_generator",
             target_word,
             "--model",
-            model_path,
+            os.path.abspath(model_path),
             "--max-samples",
             "1",
             "--batch-size",
