@@ -70,7 +70,7 @@ def validate_nonstreaming(config, data_processor, model, test_set):
     metrics["ambient_false_positives_per_hour"] = 0
     metrics["average_viable_recall"] = 0
 
-    test_set_fp = result["fp"].numpy()
+    test_set_fp = np.asarray(result["fp"])
 
     if data_processor.get_mode_size("validation_ambient") > 0:
         (
@@ -101,9 +101,9 @@ def validate_nonstreaming(config, data_processor, model, test_set):
 
         # Other than the false positive rate, all other metrics are accumulated across
         # both test sets
-        all_true_positives = ambient_predictions["tp"].numpy()
-        ambient_false_positives = ambient_predictions["fp"].numpy() - test_set_fp
-        all_false_negatives = ambient_predictions["fn"].numpy()
+        all_true_positives = np.asarray(ambient_predictions["tp"])
+        ambient_false_positives = np.asarray(ambient_predictions["fp"]) - test_set_fp
+        all_false_negatives = np.asarray(ambient_predictions["fn"])
 
         metrics["auc"] = ambient_predictions["auc"]
         metrics["loss"] = ambient_predictions["loss"]

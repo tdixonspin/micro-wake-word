@@ -158,6 +158,9 @@ class Clips:
 
         self.clips = audio_dataset
 
+    def __len__(self) -> int:
+        return len(self.clips)
+
     def audio_generator(self, split: str | None = None, repeat: int = 1):
         """A Python generator that retrieves all loaded audio clips.
 
