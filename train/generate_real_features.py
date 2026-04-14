@@ -21,7 +21,7 @@ REAL_POSITIVE_DIRS_ENV = "MWW_REAL_POSITIVE_DIRS"
 REAL_NEGATIVE_DIRS_ENV = "MWW_REAL_NEGATIVE_DIRS"
 MIN_WAVS_FOR_DATA_SPLIT = 5
 DATA_SPLIT_SEED = 10
-DATA_SPLIT_FRACTION = 0.1
+DATA_SPLIT_RATIO = 0.1
 
 
 def _read_input_dirs(env_var: str) -> list[str]:
@@ -52,7 +52,7 @@ def _generate_dataset(
 
     generated = False
     for index, input_dir in enumerate(input_dirs, start=1):
-        wav_paths = [path for path in Path(input_dir).glob("**/*.wav")]
+        wav_paths = list(Path(input_dir).glob("**/*.wav"))
         if not wav_paths:
             print(f"Skipping directory with no wav files: {input_dir}")
             continue
@@ -64,7 +64,7 @@ def _generate_dataset(
             max_clip_duration_s=None,
             remove_silence=False,
             random_split_seed=DATA_SPLIT_SEED if use_split else None,
-            split_count=DATA_SPLIT_FRACTION,
+            split_count=DATA_SPLIT_RATIO,
         )
 
         spectrograms = SpectrogramGeneration(

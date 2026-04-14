@@ -108,9 +108,7 @@ def parse_args() -> argparse.Namespace:
 
 def _resolve_input_paths(paths: list[str]) -> list[str]:
     return [
-        os.path.abspath(path)
-        if os.path.isabs(path)
-        else os.path.abspath(os.path.join(_ORIGINAL_CWD, path))
+        path if os.path.isabs(path) else os.path.abspath(os.path.join(_ORIGINAL_CWD, path))
         for path in paths
     ]
 
