@@ -27,9 +27,9 @@ def _read_input_dirs(env_var: str) -> list[str]:
         return []
 
     paths = [path for path in raw.split(os.pathsep) if path]
-    for path in paths:
-        if not os.path.isdir(path):
-            raise FileNotFoundError(f"Directory does not exist: {path}")
+    for input_dir in paths:
+        if not os.path.isdir(input_dir):
+            raise FileNotFoundError(f"Directory does not exist: {input_dir}")
     return paths
 
 

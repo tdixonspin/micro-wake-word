@@ -14,7 +14,7 @@ import yaml
 
 def _contains_mmaps(features_dir: str) -> bool:
     training_dir = os.path.join(features_dir, "training")
-    return any(Path(training_dir).glob("**/*_mmap/"))
+    return any(Path(training_dir).glob("**/*_mmap"))
 
 
 def run(target_word: str) -> None:  # noqa: ARG001
