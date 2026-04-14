@@ -11,6 +11,9 @@ from pathlib import Path
 
 import yaml
 
+REAL_POSITIVE_SAMPLING_WEIGHT = 2.0
+REAL_NEGATIVE_SAMPLING_WEIGHT = 5.0
+
 
 def _contains_mmaps(features_dir: str) -> bool:
     training_dir = os.path.join(features_dir, "training")
@@ -75,7 +78,7 @@ def run(target_word: str) -> None:  # noqa: ARG001
         config["features"].append(
             {
                 "features_dir": "generated_real_positive_features",
-                "sampling_weight": 2.0,
+                "sampling_weight": REAL_POSITIVE_SAMPLING_WEIGHT,
                 "penalty_weight": 1.0,
                 "truth": True,
                 "truncation_strategy": "truncate_start",
@@ -87,7 +90,7 @@ def run(target_word: str) -> None:  # noqa: ARG001
         config["features"].append(
             {
                 "features_dir": "generated_real_negative_features",
-                "sampling_weight": 5.0,
+                "sampling_weight": REAL_NEGATIVE_SAMPLING_WEIGHT,
                 "penalty_weight": 1.0,
                 "truth": False,
                 "truncation_strategy": "random",
