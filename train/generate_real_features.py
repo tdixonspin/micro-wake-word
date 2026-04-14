@@ -51,7 +51,7 @@ def _generate_dataset(
     ]
 
     generated = False
-    for index, input_dir in enumerate(input_dirs, start=1):
+    for dir_index, input_dir in enumerate(input_dirs, start=1):
         wav_paths = list(Path(input_dir).glob("**/*.wav"))
         if not wav_paths:
             print(f"Skipping directory with no wav files: {input_dir}")
@@ -77,7 +77,7 @@ def _generate_dataset(
         for split, split_name in split_configs:
             split_dir = os.path.join(output_root, split)
             os.makedirs(split_dir, exist_ok=True)
-            mmap_dir = os.path.join(split_dir, f"{prefix}_{index:02d}_mmap")
+            mmap_dir = os.path.join(split_dir, f"{prefix}_{dir_index:02d}_mmap")
             if os.path.exists(mmap_dir):
                 shutil.rmtree(mmap_dir)
 
