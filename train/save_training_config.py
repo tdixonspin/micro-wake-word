@@ -7,8 +7,17 @@ the number of training steps to improve model quality.
 """
 
 import os
+from pathlib import Path
 
 import yaml
+
+REAL_POSITIVE_SAMPLING_WEIGHT = 2.0
+REAL_NEGATIVE_SAMPLING_WEIGHT = 5.0
+
+
+def _contains_mmaps(features_dir: str) -> bool:
+    training_dir = os.path.join(features_dir, "training")
+    return any(Path(training_dir).glob("**/*_mmap"))
 
 
 def run(target_word: str) -> None:  # noqa: ARG001
@@ -64,6 +73,30 @@ def run(target_word: str) -> None:  # noqa: ARG001
             "type": "mmap",
         },
     ]
+
+    if _contains_mmaps("generated_real_positive_features"):
+        config["features"].append(
+            {
+                "features_dir": "generated_real_positive_features",
+                "sampling_weight": REAL_POSITIVE_SAMPLING_WEIGHT,
+                "penalty_weight": 1.0,
+                "truth": True,
+                "truncation_strategy": "truncate_start",
+                "type": "mmap",
+            }
+        )
+
+    if _contains_mmaps("generated_real_negative_features"):
+        config["features"].append(
+            {
+                "features_dir": "generated_real_negative_features",
+                "sampling_weight": REAL_NEGATIVE_SAMPLING_WEIGHT,
+                "penalty_weight": 1.0,
+                "truth": False,
+                "truncation_strategy": "random",
+                "type": "mmap",
+            }
+        )
 
     # Training steps and corresponding per-step hyperparameters
     config["training_steps"] = [10000]
